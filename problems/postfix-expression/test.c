@@ -25,5 +25,15 @@ int main(void)
     EXPECT_INT_EQ(-1, Calc("5,-3,/"));
     EXPECT_INT_EQ(1, Calc("-5,-3,/"));
 
+    /* 覆盖四种运算和多层嵌套 */
+    EXPECT_INT_EQ(14, Calc("2,3,4,*,+"));
+    EXPECT_INT_EQ(2, Calc("8,3,-,2,/"));
+    EXPECT_INT_EQ(5, Calc("15,7,1,1,+,-,/,3,*,2,1,1,+,+,-"));
+
+    /* 0 与 int 边界值 */
+    EXPECT_INT_EQ(0, Calc("7,7,-"));
+    EXPECT_INT_EQ(2147483647, Calc("2147483647"));
+    EXPECT_INT_EQ(-2147483647 - 1, Calc("-2147483648"));
+
     return finishTests();
 }
