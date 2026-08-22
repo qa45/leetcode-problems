@@ -1,0 +1,14 @@
+{
+    "C_Cpp.default.cStandard": "c17",
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.formatting": "vcFormat",
+    "terminal.integrated.env.windows": {
+        "PATH": "C:\\msys64\\ucrt64\\bin;${env:PATH}"
+    },
+    "files.associations": {
+        "*.h": "c"
+    },
+    "files.exclude": {
+        "**/*.exe": true
+    }
+}

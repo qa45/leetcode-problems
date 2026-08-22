@@ -1,0 +1,9 @@
+# Local build products
+*.exe
+*.o
+*.obj
+*.pdb
+
+# VS Code C/C++ cache
+.vscode/ipch/
+.cache/
