@@ -23,7 +23,7 @@
             "options": {
                 "cwd": "${fileDirname}",
                 "env": {
-                    "PATH": "C:\\msys64\\ucrt64\\bin;${env:PATH}"
+                    "PATH": "C:\\msys64\\ucrt64\\bin;C:\\Windows\\System32;C:\\Windows"
                 }
             },
             "problemMatcher": [
@@ -42,7 +42,7 @@
             "options": {
                 "cwd": "${fileDirname}",
                 "env": {
-                    "PATH": "C:\\msys64\\ucrt64\\bin;${env:PATH}"
+                    "PATH": "C:\\msys64\\ucrt64\\bin;C:\\Windows\\System32;C:\\Windows"
                 }
             },
             "dependsOrder": "sequence",
