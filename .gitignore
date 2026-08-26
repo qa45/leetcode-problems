@@ -7,3 +7,6 @@
 # VS Code C/C++ cache
 .vscode/ipch/
 .cache/
+
+# Keep problem statements local
+README.md
