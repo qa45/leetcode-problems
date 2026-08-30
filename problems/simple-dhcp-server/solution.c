@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 
 #define IP_COUNT 256
 #define MAX_RECORD_SIZE 2000
@@ -28,7 +29,25 @@ static int findMacRecord(const DHCPServerSys *sys,const char *mac)
     return -1;
 }
 
-static char* formatIP(int ip){
+static int selectIP(DHCPServerSys *sys) 
+{
+    if(sys->nextNeverUsed < IP_COUNT) {
+        int res = sys->nextNeverUsed;
+        sys->nextNeverUsed++;
+        sys->occupied[res] = true;
+        return res;
+    }
+    for(int i = 0;i<IP_COUNT;++i) {
+        if(sys->occupied[i] == false) {
+            sys->occupied[i] = true;
+            return i;
+        }
+    }
+    return -1;
+}
+
+static char* formatIP(int ip)
+{
     char* res = malloc(14);
     snprintf(res,14,"192.168.0.%d",ip);
     return res;
@@ -59,58 +78,33 @@ static char *DHCPServerSysRequest(DHCPServerSys *sys, const char *mac)
 {
     /* TODO: implement */
     int ret = findMacRecord(sys,mac);
-    if(ret > -1){
-        if(sys->records[ret].active == true){
+    if (ret >= 0) {
+        if (sys->records[ret].active == true )
             return formatIP(sys->records[ret].lastIP);
-        }
-        else if(sys->occupied[sys->records[ret].lastIP] == false){
+        if(sys->occupied[sys->records[ret].lastIP] == false) {
             sys->records[ret].active = true;
-            sys->occupied[sys->records[ret].lastIP] =true;
+            sys->occupied[sys->records[ret].lastIP] = true;
             return formatIP(sys->records[ret].lastIP);
         }
-        else if(sys->nextNeverUsed < 256)
-        {
-            sys->records[ret].active = true;
-            sys->records[ret].lastIP = sys->nextNeverUsed;
-            sys->occupied[sys->nextNeverUsed] =true;
-            sys->nextNeverUsed++;
-            return formatIP(sys->records[ret].lastIP);
-        }
-        else{
-            for(int i = 0;i<IP_COUNT;++i){
-                if(sys->occupied[i] == false){
-                    sys->records[ret].active = true;
-                    sys->records[ret].lastIP = i;
-                    sys->occupied[i] =true;
-                    return formatIP(i);
-                }
-            }
+        int ip = selectIP(sys);
+        if(ip == -1)
             return formatNA();
-        }
+        strcpy(sys->records[sys->recordCount].mac,mac);
+        sys->records[sys->recordCount].lastIP = ip;
+        sys->records[sys->recordCount].active = true;
+        sys->recordCount++; 
+        return formatIP(ip);
     }
-    else{
-        if(sys->nextNeverUsed<256){
-            sys->occupied[sys->nextNeverUsed] = true;
-            strcpy(sys->records[sys->recordCount].mac,mac);
-            sys->records[sys->recordCount].active = true;
-            sys->records[sys->recordCount].lastIP = sys->nextNeverUsed;
-            sys->recordCount++;
-            sys->nextNeverUsed++;
-            return formatIP(sys->records[sys->recordCount-1].lastIP);
-        }
-        else{
-            for(int i =0; i<IP_COUNT;++i){
-                if(sys->occupied[i] == false){
-                    sys->occupied[i] = true;
-                    strcpy(sys->records[sys->recordCount].mac,mac);
-                    sys->records[sys->recordCount].active = true;
-                    sys->records[sys->recordCount].lastIP = i;
-                    sys->recordCount++;
-                    return formatIP(i);
-                }
-            }
+    else {
+        int ip = selectIP(sys);
+        if(ip == -1)
             return formatNA();
-        }
+        strcpy(sys->records[sys->recordCount].mac,mac);
+        sys->records[sys->recordCount].lastIP = ip;
+        sys->records[sys->recordCount].active = true;
+        sys->recordCount++; 
+        return formatIP(ip);
+
     }
     return formatNA();
 }

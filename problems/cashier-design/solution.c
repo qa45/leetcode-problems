@@ -8,40 +8,39 @@ typedef struct {
 int *cashierCheckout(const int initCashes[4], const Payment payments[],
                      int paymentsSize, int *returnSize)
 {
-    *returnSize = 5;
     int* res = malloc(5*sizeof(int));
+    *returnSize = 5;
     memset(res,0,5*sizeof(int));
-    const int units[5] = {1,5,10,50,100};
-    for(int i=0;i<4;++i)
-    {
-        res[i] = initCashes[i];
-    }
-    for(int i = 0;i<paymentsSize;++i)
-    {
-        int available[5]={0};
-        int total = payments[i].paidCashes[0]*1+
-                    payments[i].paidCashes[1]*5+
-                    payments[i].paidCashes[2]*10+
-                    payments[i].paidCashes[3]*50+
-                    payments[i].paidCashes[4]*100;
-        int p = total-payments[i].price;
-        if(p<0)
-            continue;
-        for(int j=4;j>=0;--j)
-        {
-            available[j] = res[j] + payments[i].paidCashes[j];
-            int used = p/units[j];
-            if(used>available[j])
-                used = available[j];
-            available[j]-=used;
-            p-=used*units[j];
+    int units[5] = {1,5,10,50,100};
+    res[0] = initCashes[0];
+    res[1] = initCashes[1];
+    res[2] = initCashes[2];
+    res[3] = initCashes[3];
+    for(int i = 0;i<paymentsSize;++i) {
+        int sum = 0;
+        for(int j = 0;j<5;++j) {
+            sum+=payments[i].paidCashes[j]*units[j];
         }
-        if(p>0)
+        if(payments[i].price > sum)
             continue;
-        for(int k =0;k<5;++k)
-        {
-            res[k]=available[k];
+        const int* paidCashes = payments[i].paidCashes;
+        int temp[5] = {res[0]+paidCashes[0],res[1]+paidCashes[1],res[2]+paidCashes[2],res[3]+paidCashes[3],res[4]+paidCashes[4]};
+        int change  = sum-payments[i].price;
+        for(int k = 4;k>=0;--k) {
+            int num = change/units[k];
+            if(num>temp[k])
+                num = temp[k];
+            temp[k]-=num;
+            change-=num*units[k];
         }
+        if(change == 0) {
+            res[0] = temp[0];
+            res[1] = temp[1];
+            res[2] = temp[2];
+            res[3] = temp[3];
+            res[4] = temp[4];
+        }
+        
     }
     return res;
 }
